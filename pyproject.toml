@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "survey-schema"
+version = "0.1.0"
+description = "Typed, medium-independent definitions of survey question types and the formats of their answers."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+authors = [
+    { name = "Ryuto Yoshida" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Typing :: Typed",
+]
+dependencies = [
+    # Not on PyPI, where another package already uses the name.
+    "variable @ git+https://github.com/ry-yoshida-dev/Variable",
+]
+
+[project.urls]
+Repository = "https://github.com/ry-yoshida-dev/SurveySchema"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+survey_schema = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = ["--import-mode=importlib"]
+
+[tool.uv]
+exclude-newer = "7 days"
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.40.2",
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+]
+
+[tool.mypy]
+mypy_path = "src"
+files = ["src", "tests"]
+explicit_package_bases = true
+strict = true
+
+[tool.basedpyright]
+include = ["src", "tests"]
+# Tests construct objects inside pytest.raises only to trigger validation, so their results go unused.
+executionEnvironments = [
+    { root = "tests", extraPaths = ["src"], reportUnusedCallResult = false },
+    { root = "src" },
+]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "D"]
+# Only public classes, methods, and functions need docstrings, and multi-line ones are the local style.
+ignore = ["E501", "D100", "D104", "D105", "D200"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
